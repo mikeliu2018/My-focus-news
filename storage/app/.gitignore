@@ -1,3 +1,4 @@
 *
 !public/
+!console/resources/
 !.gitignore
