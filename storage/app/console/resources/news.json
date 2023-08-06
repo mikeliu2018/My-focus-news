@@ -1,0 +1,46 @@
+[
+  {
+    "category": "政治",
+    "url": "https://feeds.feedburner.com/rsscna/politics"
+  },
+  {
+    "category": "國際",
+    "url": "https://feeds.feedburner.com/rsscna/intworld"  
+  },
+  {
+    "category": "兩岸",
+    "url": "https://feeds.feedburner.com/rsscna/mainland"  
+  },
+  {
+    "category": "產經證券",
+    "url": "https://feeds.feedburner.com/rsscna/finance"  
+  },
+  {
+    "category": "科技",
+    "url": "https://feeds.feedburner.com/rsscna/technology"  
+  },
+  {
+    "category": "生活",
+    "url": "https://feeds.feedburner.com/rsscna/lifehealth"
+  },
+  {
+    "category": "社會",
+    "url": "https://feeds.feedburner.com/rsscna/social"
+  },
+  {
+    "category": "地方",
+    "url": "https://feeds.feedburner.com/rsscna/local"
+  },
+  {
+    "category": "文化",
+    "url": "https://feeds.feedburner.com/rsscna/culture"
+  },
+  {
+    "category": "運動",
+    "url": "https://feeds.feedburner.com/rsscna/sport"
+  },
+  {
+    "category": "娛樂",
+    "url": "https://feeds.feedburner.com/rsscna/stars"
+  }
+]
