@@ -6,7 +6,14 @@
       :breadcrumb="{ breadcrumb }"
       sub-title="中央社新聞"
     />    
-    <a-table :dataSource="dataSource" :columns="columns" :loading="loading" :expand-column-width="100">
+    <a-table 
+      :columns="columns"
+      :dataSource="dataSource"
+      :pagination="pagination"      
+      :loading="loading" 
+      :expand-column-width="100"
+      @change="handleTableChange"
+      >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'image' && record.image !== ''">        
           <img :src="`${record.image}`" class="news-image">
@@ -27,37 +34,27 @@
   </div>
 </template>
 <script setup>
-  import { onMounted, ref  } from 'vue'
+  import { onMounted, computed  } from 'vue';
+  import { usePagination } from 'vue-request';
   const breadcrumb = [];
-  const API_BASE_URL = `http://localhost/api/news/list`;
-  const params = {
-    start_date: '2023-08-01',
-    end_date: '2023-08-30',
-    keyword: ''
-  };
-  const dataSource = ref([]);
-  const loading = ref(false);
+  const fetchData = (queryParams) => {
+    const API_BASE_URL = `http://localhost/api/news/list`;
+    const defaultParams = {
+      start_date: '2023-08-01',
+      end_date: '2023-08-30',
+      keyword: ''
+    };
+    const params = { ...queryParams, ...defaultParams };
 
-  const fetchData = () => {
+    console.log('params', params);
     const API_URL = `${API_BASE_URL}?` + new URLSearchParams(params).toString();
-    loading.value = true;    
-    window.axios(API_URL).then((response) => {
+    // loading.value = true;    
+    return window.axios(API_URL).then((response) => {
       const { config, headers, data, request, status } = response;
-      data.forEach(item => {
-        dataSource.value.push({
-          key: item.id,
-          category: item.category,
-          image: item.image,
-          title: item.title,
-          content: item.content,
-          gmdate: item.gmdate,
-          link: item.link,
-        });
-      });
+      return response;
     }).catch((error)=> { 
-      console.error(error)
-    }).finally(function () {
-      loading.value = false;
+      console.error(error);
+      return error;
     });
   };
 
@@ -89,8 +86,44 @@
     }
   ];
 
-  onMounted(async() => {    
-    fetchData();
+  const {
+    data,
+    run,
+    loading,
+    current,
+    pageSize,
+  } = usePagination(fetchData, {
+    pagination: {
+      currentKey: 'page',
+      pageSizeKey: 'results',
+      totalKey: 'data.total',
+    },
+  });
+  
+  const dataSource = computed(() => data.value?.data.results.map(item => {
+    // for table do index
+    item.key = item.id
+    return item;
+  }) || []);
+
+  const pagination = computed(() => ({    
+    total: data.value?.data.total || 0,
+    current: current.value,
+    pageSize: pageSize.value,
+  }));
+
+  const handleTableChange = (pag, filters, sorter) => {
+    run({
+      results: pag.pageSize,
+      page: pag?.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+    });
+  };
+
+  onMounted(() => {        
+    console.log('onMounted');
   });          
 </script>
 
