@@ -75,17 +75,15 @@
   const fetchData = (queryParams) => {
     const API_BASE_URL = `http://localhost/api/news/list`;
     const defaultParams = {
-      start_date: '2023-08-01',
-      end_date: '2023-08-30',
       keyword: ''
     };
 
     queryParams?.category && queryParams.category === 'all' && delete queryParams.category;
-    if (queryParams?.dateRange && queryParams.dateRange !== '') {
+    if (queryParams?.dateRange && Array.isArray(queryParams.dateRange) && queryParams.dateRange.length > 1) {
       queryParams.start_date = queryParams.dateRange[0];
       queryParams.end_date = queryParams.dateRange[1];
-      delete queryParams.dateRange;
     };
+    delete queryParams.dateRange;
     console.log('queryParams', queryParams);
     const params = { ...defaultParams, ...queryParams };
 
@@ -173,7 +171,7 @@
     layout: "inline",
     keyword: '',   
     category: 'all',
-    dateRange: ''
+    dateRange: []
   });  
 
   const formItemLayout = computed(() => {

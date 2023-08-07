@@ -13,10 +13,10 @@ class NewsController extends Controller
     public function list(Request $request)
     {
         $validator = Validator::make($request->all(), [            
-            'start_date' => 'required|string|date_format:Y-m-d|before_or_equal:end_date',
-            'end_date' => 'required|string|date_format:Y-m-d|after_or_equal:start_date',
             'page' => 'required|numeric|min:1',
             'results' => 'required|numeric|min:10',
+            'start_date' => 'string|date_format:Y-m-d|before_or_equal:end_date|nullable',
+            'end_date' => 'string|date_format:Y-m-d|after_or_equal:start_date|nullable',
             'category' => 'string|max:10',
             'keyword' => 'string|max:100|nullable',
         ]);
@@ -28,10 +28,11 @@ class NewsController extends Controller
             ], 400);
         }
 
-        $start_date = new \DateTime("$request->start_date 00:00:00");
-        $end_date = new \DateTime("$request->end_date 23:59:59");    
-
-        $queryBuilder = News::whereBetween('gmdate', [$start_date, $end_date])
+        $queryBuilder = News::when(isset($request->category), function ($query) use ($request) {
+                $start_date = new \DateTime("$request->start_date 00:00:00");
+                $end_date = new \DateTime("$request->end_date 23:59:59");
+                return $query->whereBetween('gmdate', [$start_date, $end_date]);
+            })
             ->when(isset($request->category), function ($query) use ($request) {
                 return $query->where('category', '=', $request->category);
             })
