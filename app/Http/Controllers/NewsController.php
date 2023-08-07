@@ -28,7 +28,7 @@ class NewsController extends Controller
             ], 400);
         }
 
-        $queryBuilder = News::when(isset($request->category), function ($query) use ($request) {
+        $queryBuilder = News::when(isset($request->start_date) && isset($request->end_date), function ($query) use ($request) {
                 $start_date = new \DateTime("$request->start_date 00:00:00");
                 $end_date = new \DateTime("$request->end_date 23:59:59");
                 return $query->whereBetween('gmdate', [$start_date, $end_date]);
