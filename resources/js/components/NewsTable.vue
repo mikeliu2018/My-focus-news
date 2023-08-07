@@ -5,7 +5,42 @@
       title="國內外新聞"
       :breadcrumb="{ breadcrumb }"
       sub-title="中央社新聞"
-    />    
+    >
+      <a-form            
+        ref="formRef"
+        :layout="formState.layout"
+        v-bind="formItemLayout"
+        :model="formState"
+        >
+        <a-form-item label="類別" name="category">
+          <a-select v-model:value="formState.category" placeholder="請選擇一種類別">
+            <a-select-option value="all" selected="selected">全部</a-select-option>
+            <a-select-option value="政治">政治</a-select-option>
+            <a-select-option value="國際">國際</a-select-option>
+            <a-select-option value="兩岸">兩岸</a-select-option>
+            <a-select-option value="產經證券">產經證券</a-select-option>
+            <a-select-option value="科技">科技</a-select-option>
+            <a-select-option value="生活">生活</a-select-option>
+            <a-select-option value="社會">社會</a-select-option>
+            <a-select-option value="地方">地方</a-select-option>
+            <a-select-option value="文化">文化</a-select-option>
+            <a-select-option value="運動">運動</a-select-option>
+            <a-select-option value="娛樂">娛樂</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item ref="dateRange" name="dateRange" label="發佈時間">
+          <a-range-picker v-model:value="formState.dateRange" value-format="YYYY-MM-DD" />
+        </a-form-item>
+        <a-form-item label="關鍵字" ref="keyword" name="keyword">
+          <a-input v-model:value="formState.keyword" />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="onSubmit">查詢</a-button>
+          <a-button style="margin-left: 10px" @click="resetForm">取消</a-button>
+        </a-form-item>
+      </a-form>
+    </a-page-header>    
+
     <a-table 
       :columns="columns"
       :dataSource="dataSource"
@@ -34,7 +69,7 @@
   </div>
 </template>
 <script setup>
-  import { onMounted, computed  } from 'vue';
+  import { onMounted, computed, reactive, toRaw, ref } from 'vue';
   import { usePagination } from 'vue-request';
   const breadcrumb = [];
   const fetchData = (queryParams) => {
@@ -44,7 +79,15 @@
       end_date: '2023-08-30',
       keyword: ''
     };
-    const params = { ...queryParams, ...defaultParams };
+
+    queryParams?.category && queryParams.category === 'all' && delete queryParams.category;
+    if (queryParams?.dateRange && queryParams.dateRange !== '') {
+      queryParams.start_date = queryParams.dateRange[0];
+      queryParams.end_date = queryParams.dateRange[1];
+      delete queryParams.dateRange;
+    };
+    console.log('queryParams', queryParams);
+    const params = { ...defaultParams, ...queryParams };
 
     console.log('params', params);
     const API_URL = `${API_BASE_URL}?` + new URLSearchParams(params).toString();
@@ -113,13 +156,52 @@
   }));
 
   const handleTableChange = (pag, filters, sorter) => {
+    const params = toRaw(formState);
     run({
       results: pag.pageSize,
       page: pag?.current,
       sortField: sorter.field,
       sortOrder: sorter.order,
       ...filters,
+      ...params,
     });
+  };
+
+  const formRef = ref();
+
+  const formState = reactive({
+    layout: "inline",
+    keyword: '',   
+    category: 'all',
+    dateRange: ''
+  });  
+
+  const formItemLayout = computed(() => {
+    const {
+      layout,
+    } = formState;
+    return layout === 'horizontal' ? {
+      labelCol: {
+        span: 2,
+      },
+      wrapperCol: {
+        span: 4,
+      },
+    } : {};
+  });
+
+  const onSubmit = () => {
+    const params = toRaw(formState);
+    console.log('submit!', params);
+    run({
+      results: pageSize.value,
+      page: 1,      
+      ...params,
+    });
+  };
+
+  const resetForm = () => {
+    formRef.value.resetFields();
   };
 
   onMounted(() => {        
