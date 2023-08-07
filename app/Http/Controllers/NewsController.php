@@ -15,6 +15,8 @@ class NewsController extends Controller
         $validator = Validator::make($request->all(), [            
             'start_date' => 'required|string|date_format:Y-m-d|before_or_equal:end_date',
             'end_date' => 'required|string|date_format:Y-m-d|after_or_equal:start_date',
+            'page' => 'required|numeric|min:1',
+            'results' => 'required|numeric|min:10',
             'category' => 'string|max:10',
             'keyword' => 'string|max:100|nullable',
         ]);
@@ -29,7 +31,7 @@ class NewsController extends Controller
         $start_date = new \DateTime("$request->start_date 00:00:00");
         $end_date = new \DateTime("$request->end_date 23:59:59");    
 
-        $result = News::whereBetween('gmdate', [$start_date, $end_date])
+        $queryBuilder = News::whereBetween('gmdate', [$start_date, $end_date])
             ->when(isset($request->category), function ($query) use ($request) {
                 return $query->where('category', '=', $request->category);
             })
@@ -38,10 +40,12 @@ class NewsController extends Controller
                     $query->where('title', 'LIKE', "%$request->keyword%")
                             ->orWhere('content', 'LIKE', "%$request->keyword%");
                 });
-            })
-            ->orderBy('gmdate', 'DESC')
-            ->get();        
-
-        return response()->json($result);
+            });
+        $total = $queryBuilder->count();
+        $result = $queryBuilder->skip(($request->page-1) * $request->results)->take($request->results)->orderBy('gmdate', 'DESC')->get();
+        return response()->json([
+            "results" => $result,
+            "total" => $total
+        ]);
     }
 }
