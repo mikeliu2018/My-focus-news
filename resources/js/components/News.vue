@@ -1,31 +1,16 @@
 <template>
   <div>
-    <a-page-header
-      style="border: 1px solid rgb(235, 237, 240)"
-      title="國內外新聞"
-      :breadcrumb="{ breadcrumb }"
-      sub-title="中央社新聞"
-    >
-      <a-form            
+    <Header title="我的關注新聞" subTitle="中央社新聞"></Header>
+    <a-card title="過濾條件">
+      <a-form
         ref="formRef"
         :layout="formState.layout"
         v-bind="formItemLayout"
         :model="formState"
         >
         <a-form-item label="類別" name="category">
-          <a-select v-model:value="formState.category" placeholder="請選擇一種類別">
-            <a-select-option value="all" selected="selected">全部</a-select-option>
-            <a-select-option value="政治">政治</a-select-option>
-            <a-select-option value="國際">國際</a-select-option>
-            <a-select-option value="兩岸">兩岸</a-select-option>
-            <a-select-option value="產經證券">產經證券</a-select-option>
-            <a-select-option value="科技">科技</a-select-option>
-            <a-select-option value="生活">生活</a-select-option>
-            <a-select-option value="社會">社會</a-select-option>
-            <a-select-option value="地方">地方</a-select-option>
-            <a-select-option value="文化">文化</a-select-option>
-            <a-select-option value="運動">運動</a-select-option>
-            <a-select-option value="娛樂">娛樂</a-select-option>
+          <a-select v-model:value="formState.category" placeholder="請選擇一種類別">                     
+            <a-select-option v-for="(category) in categorys" :value="category.key">{{category.value}}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item ref="dateRange" name="dateRange" label="發佈時間">
@@ -39,41 +24,57 @@
           <a-button style="margin-left: 10px" @click="resetForm">取消</a-button>
         </a-form-item>
       </a-form>
-    </a-page-header>    
-
-    <a-table 
-      :columns="columns"
-      :dataSource="dataSource"
-      :pagination="pagination"      
-      :loading="loading" 
-      :expand-column-width="100"
-      @change="handleTableChange"
-      >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'image' && record.image !== ''">        
-          <img :src="`${record.image}`" class="news-image">
+    </a-card>
+    <a-card title="查詢結果">
+      <a-table 
+        :columns="columns"
+        :dataSource="dataSource"
+        :pagination="pagination"      
+        :loading="loading" 
+        :expand-column-width="100"
+        @change="handleTableChange"
+        >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'image' && record.image !== ''">        
+            <img :src="`${record.image}`" class="news-image">
+          </template>
+          <template v-else-if="column.key === 'link'">
+            <a :href="`${record.link}`" target="_blank">{{ record.link }}</a>
+          </template>
         </template>
-        <template v-else-if="column.key === 'link'">
-          <a :href="`${record.link}`" target="_blank">{{ record.link }}</a>
+        <template #expandedRowRender="{ record }">
+          <p style="margin: 0">
+            {{ record.content }}
+          </p>
         </template>
-      </template>
-      <template #expandedRowRender="{ record }">
-        <p style="margin: 0">
-          {{ record.content }}
-        </p>
-      </template>
-      <template #expandColumnTitle>
-        <span style="color: red">More</span>
-      </template>
-    </a-table>
+        <template #expandColumnTitle>
+          <span style="color: red">More</span>
+        </template>
+      </a-table>
+    </a-card>
   </div>
 </template>
 <script setup>
-  import { onMounted, computed, reactive, toRaw, ref } from 'vue';
+  import { computed, reactive, toRaw, ref } from 'vue';
   import { usePagination } from 'vue-request';
-  const breadcrumb = [];
+  import Header from './Header.vue';
+  const categorys = [
+    { key: 'all', value: '全部' },
+    { key: '政治', value: '政治' },
+    { key: '國際', value: '國際' },
+    { key: '兩岸', value: '兩岸' },
+    { key: '產經證券', value: '產經證券' },
+    { key: '科技', value: '科技' },
+    { key: '生活', value: '生活' },
+    { key: '社會', value: '社會' },
+    { key: '地方', value: '地方' },
+    { key: '文化', value: '文化' },
+    { key: '運動', value: '運動' },
+    { key: '娛樂', value: '娛樂' },
+  ];
+
   const fetchData = (queryParams) => {
-    const API_BASE_URL = `http://localhost/api/news/list`;
+    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news/list`;
     const defaultParams = {
       keyword: ''
     };
@@ -201,10 +202,6 @@
   const resetForm = () => {
     formRef.value.resetFields();
   };
-
-  onMounted(() => {        
-    console.log('onMounted');
-  });          
 </script>
 
 <style>

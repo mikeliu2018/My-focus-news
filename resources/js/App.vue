@@ -1,9 +1,5 @@
 <template>
-    <div>        
-        <NewsTable></NewsTable>
+    <div>
+        <router-view></router-view>
     </div>
 </template>
-
-<script setup>
-    import NewsTable from './components/NewsTable.vue'
-</script>
