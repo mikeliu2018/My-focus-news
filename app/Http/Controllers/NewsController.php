@@ -37,11 +37,13 @@ class NewsController extends Controller
                 return $query->where('category', '=', $request->category);
             })
             ->when(isset($request->keyword), function ($query) use ($request) {
-                return $query->where(function ($query) use ($request) {
-                    $query->whereRaw('match(title, content) against (? IN NATURAL LANGUAGE MODE)', [$request->keyword]);
+                return $query->where(function ($query) use ($request) {                    
+                    $query->whereRaw('match(title, content) against (? IN BOOLEAN MODE)', [$request->keyword]);
                 });
             });
         $total = $queryBuilder->count('id');
+        // $sql = $queryBuilder->skip(($request->page-1) * $request->results)->take($request->results)->orderBy('gmdate', 'DESC')->toSql();
+        // Log::debug($sql);
         $result = $queryBuilder->skip(($request->page-1) * $request->results)->take($request->results)->orderBy('gmdate', 'DESC')->get();
         return response()->json([
             "results" => $result,
