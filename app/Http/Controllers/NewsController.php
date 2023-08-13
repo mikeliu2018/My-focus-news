@@ -38,11 +38,10 @@ class NewsController extends Controller
             })
             ->when(isset($request->keyword), function ($query) use ($request) {
                 return $query->where(function ($query) use ($request) {
-                    $query->where('title', 'LIKE', "%$request->keyword%")
-                            ->orWhere('content', 'LIKE', "%$request->keyword%");
+                    $query->whereRaw('match(title, content) against (? IN NATURAL LANGUAGE MODE)', [$request->keyword]);
                 });
             });
-        $total = $queryBuilder->count();
+        $total = $queryBuilder->count('id');
         $result = $queryBuilder->skip(($request->page-1) * $request->results)->take($request->results)->orderBy('gmdate', 'DESC')->get();
         return response()->json([
             "results" => $result,
