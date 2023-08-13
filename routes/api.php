@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::Get('/news/list', [NewsController::class, 'list']);
+
+Route::middleware(['api'])->group(function() {
+    Route::Put('/user/login', [UserController::class, 'login']);
+    Route::Put('/user/logout', [UserController::class, 'logout']);
+    Route::post('/user/register', [UserController::class, 'register']);    
+});
