@@ -57,7 +57,10 @@
 <script setup>
   import { computed, reactive, toRaw, ref } from 'vue';
   import { usePagination } from 'vue-request';
+  // import moment from 'moment';
+  import moment from 'moment-timezone';
   import Header from './Header.vue';
+
   const categorys = [
     { key: 'all', value: '全部' },
     { key: '政治', value: '政治' },
@@ -72,33 +75,6 @@
     { key: '運動', value: '運動' },
     { key: '娛樂', value: '娛樂' },
   ];
-
-  const fetchData = (queryParams) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news/list`;
-    const defaultParams = {
-      keyword: ''
-    };
-
-    queryParams?.category && queryParams.category === 'all' && delete queryParams.category;
-    if (queryParams?.dateRange && Array.isArray(queryParams.dateRange) && queryParams.dateRange.length > 1) {
-      queryParams.start_date = queryParams.dateRange[0];
-      queryParams.end_date = queryParams.dateRange[1];
-    };
-    delete queryParams.dateRange;
-    console.log('queryParams', queryParams);
-    const params = { ...defaultParams, ...queryParams };
-
-    console.log('params', params);
-    const API_URL = `${API_BASE_URL}?` + new URLSearchParams(params).toString();
-    // loading.value = true;    
-    return window.axios(API_URL).then((response) => {
-      const { config, headers, data, request, status } = response;
-      return response;
-    }).catch((error)=> { 
-      console.error(error);
-      return error;
-    });
-  };
 
   const columns = [
     {
@@ -128,44 +104,9 @@
     }
   ];
 
-  const {
-    data,
-    run,
-    loading,
-    current,
-    pageSize,
-  } = usePagination(fetchData, {
-    pagination: {
-      currentKey: 'page',
-      pageSizeKey: 'results',
-      totalKey: 'data.total',
-    },
-  });
+  const timezone = moment.tz.guess();  
+  console.log('timezone', timezone);
   
-  const dataSource = computed(() => data.value?.data.results.map(item => {
-    // for table do index
-    item.key = item.id
-    return item;
-  }) || []);
-
-  const pagination = computed(() => ({    
-    total: data.value?.data.total || 0,
-    current: current.value,
-    pageSize: pageSize.value,
-  }));
-
-  const handleTableChange = (pag, filters, sorter) => {
-    const params = toRaw(formState);
-    run({
-      results: pag.pageSize,
-      page: pag?.current,
-      sortField: sorter.field,
-      sortOrder: sorter.order,
-      ...filters,
-      ...params,
-    });
-  };
-
   const formRef = ref();
 
   const formState = reactive({
@@ -173,7 +114,7 @@
     keyword: '',   
     category: 'all',
     dateRange: []
-  });  
+  });
 
   const formItemLayout = computed(() => {
     const {
@@ -189,14 +130,83 @@
     } : {};
   });
 
-  const onSubmit = () => {
-    const params = toRaw(formState);
-    console.log('submit!', params);
-    run({
-      results: pageSize.value,
-      page: 1,      
-      ...params,
+  const fetchData = (queryParams) => {
+    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news/list`;
+    const defaultParams = {
+      keyword: '',
+    };
+    console.log('queryParams', queryParams);
+    queryParams?.category && queryParams.category === 'all' && delete queryParams.category;
+    if (queryParams?.dateRange && Array.isArray(queryParams.dateRange) && queryParams.dateRange.length > 1) {
+      queryParams.start_date = queryParams.dateRange[0];
+      queryParams.end_date = queryParams.dateRange[1];
+      queryParams.timezone = timezone;
+    };
+    delete queryParams.dateRange;
+    const params = { ...defaultParams, ...queryParams };
+
+    console.log('params', params);
+    const API_URL = `${API_BASE_URL}?` + new URLSearchParams(params).toString();
+    return window.axios(API_URL).then((response) => {
+      // const { config, headers, data, request, status } = response;
+      return response;
     });
+  };
+
+  const {
+    data,
+    run,
+    loading,
+    current,
+    pageSize,
+  } = usePagination(fetchData, {
+    // first parameter will pass to fetchData
+    defaultParams: [
+      {        
+        ...toRaw(formState)
+      },
+    ],
+    pagination: {
+      currentKey: 'page',
+      pageSizeKey: 'results',
+      totalKey: 'data.total',
+    },
+  });
+  
+  const dataSource = computed(() => data.value?.data.results.map(item => {
+    // for table do index
+    item.key = item.id;
+    item.gmdate = moment.utc(item.gmdate, 'YYYY-MM-DD hh:mm:ss').tz(timezone).format('YYYY-MM-DD HH:mm:ss');
+    return item;
+  }) || []);
+
+  const pagination = computed(() => ({    
+    total: data.value?.data.total || 0,
+    current: current.value,
+    pageSize: pageSize.value,
+  }));
+
+  const handleTableChange = (pag, filters, sorter) => {
+    const queryParams = {
+      results: pag.pageSize,
+      page: pag?.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+      ...toRaw(formState),
+    };
+    run(queryParams);
+  };
+
+  const onSubmit = () => {
+    const initPage = 1;
+    const queryParams = {
+      results: pageSize.value,
+      page: initPage,
+      ...toRaw(formState)
+    };
+    console.log('submit!', queryParams);    
+    run(queryParams);
   };
 
   const resetForm = () => {
