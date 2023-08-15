@@ -17,6 +17,7 @@ class NewsController extends Controller
             'results' => 'required|numeric|min:10',
             'start_date' => 'string|date_format:Y-m-d|before_or_equal:end_date|nullable',
             'end_date' => 'string|date_format:Y-m-d|after_or_equal:start_date|nullable',
+            'timezone' => 'required_with_all:start_date,end_date|string',
             'category' => 'string|max:10',
             'keyword' => 'string|max:100|nullable',
         ]);
@@ -28,9 +29,16 @@ class NewsController extends Controller
             ], 400);
         }
 
-        $queryBuilder = News::when(isset($request->start_date) && isset($request->end_date), function ($query) use ($request) {
-                $start_date = new \DateTime("$request->start_date 00:00:00");
-                $end_date = new \DateTime("$request->end_date 23:59:59");
+        $queryBuilder = News::when(isset($request->start_date) && isset($request->end_date) && isset($request->timezone), function ($query) use ($request) {
+                // 取得使用者 timezone 並轉成 UTC 查詢
+                $timezone = new \DateTimeZone($request->timezone);
+                $UTC = new \DateTimeZone('UTC');
+                $datetime = new \DateTime("$request->start_date 00:00:00", $timezone);
+                $datetime->setTimezone($UTC);
+                $start_date = $datetime->format('Y-m-d H:i:s');
+                $datetime = new \DateTime("$request->end_date 23:59:59", $timezone);
+                $datetime->setTimezone($UTC);
+                $end_date = $datetime->format('Y-m-d H:i:s');
                 return $query->whereBetween('gmdate', [$start_date, $end_date]);
             })
             ->when(isset($request->category), function ($query) use ($request) {
