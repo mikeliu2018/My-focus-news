@@ -192,9 +192,6 @@
         loading.value = false;
         if (error?.response?.data?.error) {
           message.error(error.response.data.error);
-          setTimeout(() => {
-            open.value = false;
-          }, 500);
         }
       })
       .finally(() => {
