@@ -4,6 +4,7 @@ import Home from './components/Home.vue';
 import News from './components/News.vue';
 import Register from './components/Register.vue';
 import Login from './components/Login.vue';
+import NewsFocus from './components/NewsFocus.vue';
 
 const routes = [
   { 
@@ -26,6 +27,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login
+  },
+  { 
+    path: '/news_focus',
+    name: 'news_focus',
+    component: NewsFocus
   },
 ];
 

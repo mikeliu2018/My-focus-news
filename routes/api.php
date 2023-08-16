@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\NewsFocusController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,5 +27,9 @@ Route::Get('/news/list', [NewsController::class, 'list']);
 Route::middleware(['api'])->group(function() {
     Route::Put('/user/login', [UserController::class, 'login']);
     Route::Put('/user/logout', [UserController::class, 'logout']);
-    Route::post('/user/register', [UserController::class, 'register']);    
+    Route::post('/user/register', [UserController::class, 'register']);
+
+    Route::get('/news_focus/list', [NewsFocusController::class, 'list']);
+    Route::post('/news_focus/add', [NewsFocusController::class, 'add']);    
+    Route::delete('/news_focus/remove', [NewsFocusController::class, 'remove']);
 });

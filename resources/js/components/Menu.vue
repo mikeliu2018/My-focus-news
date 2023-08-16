@@ -30,51 +30,17 @@ const items = computed(() => {
   ];
 
   const { isLoggedIn } = storeToRefs(userStore);
-
-  isLoggedIn.value === false ? items.push({
-      key: 'login',
-      label: '會員登入',
-      title: '會員登入',
-    }) : items.push({
-      key: 'logout',
-      label: '會員登出',
-      title: '會員登出',
-    });
+  isLoggedIn.value === true && items.push(
+    {
+      key: 'news_focus',
+      label: '我的關注',
+      title: '我的關注',
+    }
+  );
   return items;
 });
 
-const doLogout = () => {
-  const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/user/logout`;
-  const defaultParams = {};  
-  const params = { ...defaultParams };
-  console.log('params', params);
-  const API_URL = `${API_BASE_URL}`;  
-  const { token } = storeToRefs(userStore);
-  const headers = {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      'Authorization' : `Bearer ${token.value}`
-    }
-  };
-  return window.axios.put(API_URL, params, headers).then((response) => {
-    const { config, headers, data, request, status } = response;
-    return response;
-  });
-};
-
 const onSelect = ({ item, key, selectedKeys }) => {
-  if (key === 'logout') {
-    doLogout()
-    .then(response => {
-      console.log('logout response', response);      
-      userStore.$reset();
-    })
-    .catch(error => {
-      console.error(error);
-    })
-  } else {
-    router.push({name: key});
-  }  
+  router.push({name: key}); 
 }
 </script>

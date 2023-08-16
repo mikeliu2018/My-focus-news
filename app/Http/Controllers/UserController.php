@@ -95,8 +95,11 @@ class UserController extends Controller
     public function logout()
     {
         auth('api')->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        $result = [
+            'status' => true,
+            'result' => '登出成功',
+        ];
+        return response()->json($result);
     }
 
     public function refresh()
