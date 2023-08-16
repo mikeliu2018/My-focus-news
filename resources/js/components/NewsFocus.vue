@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header title="我的關注新聞" subTitle="中央社新聞"></Header>
+    <Header title="我的關注新聞" subTitle="我的關注"></Header>
     <a-card title="過濾條件">
       <a-form
         ref="formRef"
@@ -63,7 +63,6 @@
   import { useUserStore } from '@/stores';
   import Header from './Header.vue';
   import NewsDetail from './NewsDetail.vue';
-  
   const userStore = useUserStore();
 
   const categorys = [
@@ -152,7 +151,7 @@
   });
 
   const fetchData = (queryParams) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news/list`;
+    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news_focus/list`;
     const defaultParams = {
       keyword: '',
     };
@@ -167,18 +166,14 @@
     const params = { ...defaultParams, ...queryParams };
 
     console.log('params', params);
+    const { token } = storeToRefs(userStore);
     const headers = {
       headers: {
         'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',          
+        'X-Requested-With': 'XMLHttpRequest',
+        'Authorization' : `Bearer ${token.value}`
       }
     };
-    const { isLoggedIn } = storeToRefs(userStore);
-    if (isLoggedIn.value === true) {
-      const { token } = storeToRefs(userStore);
-      headers['headers']['Authorization'] = `Bearer ${token.value}`;       
-    }
-    
     const API_URL = `${API_BASE_URL}?` + new URLSearchParams(params).toString();
     return window.axios.get(API_URL, headers).then((response) => {
       // const { config, headers, data, request, status } = response;
