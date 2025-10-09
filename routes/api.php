@@ -22,14 +22,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::Get('/news/list', [NewsController::class, 'list']);
+Route::get('/news', [NewsController::class, 'list']);
 
 Route::middleware(['api'])->group(function() {
-    Route::Put('/user/login', [UserController::class, 'login']);
-    Route::Put('/user/logout', [UserController::class, 'logout']);
+    Route::put('/user/login', [UserController::class, 'login']); // 保持 login 不變，因為前端 Login.vue 未提供
+    Route::post('/user/logout', [UserController::class, 'logout']);
     Route::post('/user/register', [UserController::class, 'register']);
 
-    Route::get('/news_focus/list', [NewsFocusController::class, 'list']);
-    Route::post('/news_focus/add', [NewsFocusController::class, 'add']);    
-    Route::delete('/news_focus/remove', [NewsFocusController::class, 'remove']);
+    Route::get('/news-focus', [NewsFocusController::class, 'list']);
+    Route::post('/news-focus', [NewsFocusController::class, 'add']);
+    Route::delete('/news-focus/{id}', [NewsFocusController::class, 'remove']);
 });

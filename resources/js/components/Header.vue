@@ -20,7 +20,7 @@
   import { message } from 'ant-design-vue';
   import { storeToRefs } from 'pinia';
   import { useUserStore } from '@/stores';
-  import Menu from './Menu.vue';    
+  import Menu from './Menu.vue';
   const props = defineProps(['title', 'breadcrumb', 'subTitle']);
   const title = props?.title || '';
   const subTitle = props?.subTitle || '';
@@ -34,11 +34,11 @@
   };
 
   const doLogout = () => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/user/logout`;
-    const defaultParams = {};  
+    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/user/logout`; // URL 保持不變
+    const defaultParams = {};
     const params = { ...defaultParams };
     console.log('params', params);
-    const API_URL = `${API_BASE_URL}`;  
+    const API_URL = `${API_BASE_URL}`;
     const { token } = storeToRefs(userStore);
     const headers = {
       headers: {
@@ -47,7 +47,8 @@
         'Authorization' : `Bearer ${token.value}`
       }
     };
-    return window.axios.put(API_URL, params, headers).then((response) => {
+    // 將請求方法從 PUT 改為 POST
+    return window.axios.post(API_URL, params, headers).then((response) => {
       const { config, headers, data, request, status } = response;
       return response;
     });
@@ -60,7 +61,7 @@
       if (response?.data?.result) {
         message.info(response.data.result);
         userStore.$reset();
-      }      
+      }
     })
     .catch(error => {
       console.error(error);

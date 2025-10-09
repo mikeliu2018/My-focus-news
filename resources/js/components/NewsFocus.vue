@@ -9,7 +9,7 @@
         :model="formState"
         >
         <a-form-item label="類別" name="category">
-          <a-select v-model:value="formState.category" placeholder="請選擇一種類別">                     
+          <a-select v-model:value="formState.category" placeholder="請選擇一種類別">
             <a-select-option v-for="(category) in categorys" :value="category.key">{{category.value}}</a-select-option>
           </a-select>
         </a-form-item>
@@ -26,16 +26,16 @@
       </a-form>
     </a-card>
     <a-card title="查詢結果">
-      <a-table 
+      <a-table
         :columns="columns"
         :dataSource="dataSource"
-        :pagination="pagination"      
-        :loading="loading" 
+        :pagination="pagination"
+        :loading="loading"
         :expand-column-width="100"
         @change="handleTableChange"
         >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'image' && record.image !== ''">        
+          <template v-if="column.key === 'image' && record.image !== ''">
             <img :src="`${record.image}`" class="news-image">
           </template>
           <template v-else-if="column.key === 'link'">
@@ -45,9 +45,9 @@
             <span>
               <a-space wrap>
                 <a-button type="primary" @click="showDrawer(record)">詳細</a-button>
-              </a-space>              
+              </a-space>
             </span>
-          </template>          
+          </template>
         </template>
       </a-table>
     </a-card>
@@ -112,7 +112,7 @@
     },
   ];
 
-  const open = ref(false);  
+  const open = ref(false);
   let selectedRecord = {};
 
   const refresh = ref(false);
@@ -124,14 +124,14 @@
     }
   });
 
-  const timezone = moment.tz.guess();  
+  const timezone = moment.tz.guess();
   console.log('timezone', timezone);
-  
+
   const formRef = ref();
 
   const formState = reactive({
     layout: "inline",
-    keyword: '',   
+    keyword: '',
     category: 'all',
     dateRange: []
   });
@@ -151,7 +151,7 @@
   });
 
   const fetchData = (queryParams) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news_focus/list`;
+    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news-focus`;
     const defaultParams = {
       keyword: '',
     };
@@ -190,7 +190,7 @@
   } = usePagination(fetchData, {
     // first parameter will pass to fetchData
     defaultParams: [
-      {        
+      {
         ...toRaw(formState)
       },
     ],
@@ -200,15 +200,15 @@
       totalKey: 'data.total',
     },
   });
-  
-  const dataSource = computed(() => data.value?.data.results.map(item => {
+
+  const dataSource = computed(() => data.value?.data.data.map(item => {
     // for table do index
     item.key = item.id;
     item.gmdate = moment.utc(item.gmdate, 'YYYY-MM-DD hh:mm:ss').tz(timezone).format('YYYY-MM-DD HH:mm:ss');
     return item;
   }) || []);
 
-  const pagination = computed(() => ({    
+  const pagination = computed(() => ({
     total: data.value?.data.total || 0,
     current: current.value,
     pageSize: pageSize.value,
@@ -233,7 +233,7 @@
       page: initPage,
       ...toRaw(formState)
     };
-    console.log('submit!', queryParams);    
+    console.log('submit!', queryParams);
     run(queryParams);
   };
 

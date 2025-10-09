@@ -1,8 +1,8 @@
 <template>
-  <a-drawer 
-    width="400"    
-    placement="right" 
-    :closable="true" 
+  <a-drawer
+    width="400"
+    placement="right"
+    :closable="true"
     v-model:open="open"
     v-model:refresh="refresh"
     :record="record"
@@ -31,14 +31,14 @@
   import { HeartOutlined, HeartFilled, CommentOutlined } from '@ant-design/icons-vue';
   import { message } from 'ant-design-vue';
   import { storeToRefs } from 'pinia';
-  import { useUserStore } from '@/stores';  
+  import { useUserStore } from '@/stores';
   import LoginModal from './LoginModal.vue';
   const props = defineProps(['open', 'record', 'refresh']);
   const emit = defineEmits(['update:open', 'update:refresh']);
   const record = ref(props.record);
   const openLoginModal = ref(false);
   const open = computed({
-    get() {      
+    get() {
       console.log('record', record.value);
       return props.open;
     },
@@ -46,7 +46,7 @@
       emit('update:open', value);
     }
   });
-  
+
   const refresh = computed({
     get() {
       console.log('refresh', props.refresh);
@@ -57,16 +57,15 @@
     }
   })
 
-  const userStore = useUserStore();  
+  const userStore = useUserStore();
 
   const doFocusNewsAdd = (record) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news_focus/add`;
+    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news-focus`;
     const defaultParams = {
       id: record.id,
-    };  
+    };
     const params = { ...defaultParams };
     console.log('params', params);
-    const API_URL = `${API_BASE_URL}`;  
     const { token } = storeToRefs(userStore);
     const headers = {
       headers: {
@@ -75,34 +74,29 @@
         'Authorization' : `Bearer ${token.value}`
       }
     };
-    return window.axios.post(API_URL, params, headers).then((response) => {
+    return window.axios.post(API_BASE_URL, params, headers).then((response) => {
       const { config, headers, data, request, status } = response;
       return response;
-    });    
+    });
   }
 
   const doFocusNewsRemove = (record) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news_focus/remove`;
-    const defaultParams = {
-      id: record.id,
-    };  
-    const params = { ...defaultParams };
-    console.log('params', params);
-    const API_URL = `${API_BASE_URL}`;  
+    const API_URL = `${import.meta.env.VITE_APP_URL}/api/news-focus/${record.id}`;
     const { token } = storeToRefs(userStore);
     const headers = {
       headers: {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        'Authorization' : `Bearer ${token.value}`
+        'Authorization' : `Bearer ${token.value}`,
       }
     };
-    return window.axios.delete(API_URL, { ...headers, params}).then((response) => {
+    // 將 id 放在 URL 中，不再需要 body 或 params
+    return window.axios.delete(API_URL, headers).then((response) => {
       const { config, headers, data, request, status } = response;
       return response;
-    });    
+    });
   }
-  
+
   const onClose = () => {
     console.log('onClose');
   }
@@ -130,8 +124,8 @@
           if (response?.data?.result) {
             open.value = false;
             refresh.value = true;
-            message.info(response.data.result);            
-          }      
+            message.info(response.data.result);
+          }
         })
         .catch(error => {
           console.error(error);
@@ -143,15 +137,15 @@
           if (response?.data?.result) {
             open.value = false;
             refresh.value = true;
-            message.info(response.data.result);            
-          }      
+            message.info(response.data.result);
+          }
         })
         .catch(error => {
           console.error(error);
         });
       }
-      
+
     }
-  }  
+  }
 
 </script>
