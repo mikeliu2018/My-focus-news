@@ -21,3 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('app');
 });
+
+Route::get('/{any}', function () {
+    return view('app'); // 返回 Vue.js 的入口文件，通常是 app.blade.php
+})->where('any', '.*');
