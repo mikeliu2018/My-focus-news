@@ -1,16 +1,17 @@
-version: '3'
+# version: '3'
 services:
-    laravel.test:
+    my-focus-news:
+        container_name: my-focus-news
         build:
             context: ./docker/8.2
             dockerfile: Dockerfile
             args:
-                WWWGROUP: '${WWWGROUP}'
+                WWWGROUP: '${WWWGROUP:-1000}'
         image: sail-8.2/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
-            - '${APP_PORT:-80}:80'
+            - '${APP_PORT:-18080}:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
             WWWUSER: '${WWWUSER}'
@@ -27,8 +28,8 @@ services:
             - redis
             - meilisearch
             - mailpit
-            - selenium
     mysql:
+        container_name: my-focus-news-mysql
         image: 'mysql/mysql-server:8.0'
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
@@ -53,6 +54,7 @@ services:
             retries: 3
             timeout: 5s
     redis:
+        container_name: my-focus-news-redis
         image: 'redis:alpine'
         ports:
             - '${FORWARD_REDIS_PORT:-6379}:6379'
@@ -68,6 +70,7 @@ services:
             retries: 3
             timeout: 5s
     meilisearch:
+        container_name: my-focus-news-meilisearch
         image: 'getmeili/meilisearch:latest'
         ports:
             - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
@@ -85,18 +88,11 @@ services:
             retries: 3
             timeout: 5s
     mailpit:
+        container_name: my-focus-news-mailpit
         image: 'axllent/mailpit:latest'
         ports:
             - '${FORWARD_MAILPIT_PORT:-1025}:1025'
             - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
-        networks:
-            - sail
-    selenium:
-        image: selenium/standalone-chrome
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
-        volumes:
-            - '/dev/shm:/dev/shm'
         networks:
             - sail
 networks:
