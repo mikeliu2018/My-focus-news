@@ -5,6 +5,7 @@ import Components from 'unplugin-vue-components/vite';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
+    base: './',
     define: {
         'process.env': {
             VITE_APP_URL: process.env.VITE_APP_URL || 'http://my-focus-news:80',

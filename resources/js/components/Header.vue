@@ -3,7 +3,7 @@
     <a-page-header
         style="border: 1px solid rgb(235, 237, 240)"
         :title="`${title}`"
-        :breadcrumb="{ breadcrumb }"
+        :breadcrumb="{ routes: breadcrumb }"
         :sub-title="`${subTitle}`"
         >
         <template #extra>
@@ -34,7 +34,7 @@
   };
 
   const doLogout = () => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/user/logout`; // URL 保持不變
+    const API_BASE_URL = `/api/user/logout`; // use root-relative API path
     const defaultParams = {};
     const params = { ...defaultParams };
     console.log('params', params);

@@ -18,5 +18,8 @@ chmod -R ugo+rw /.composer
 if [ $# -gt 0 ]; then
     exec gosu $WWWUSER "$@"
 else
+chown -R sail:sail /var/www/html/storage
+chown -R sail:sail /var/www/html/bootstrap/cache
+
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 fi

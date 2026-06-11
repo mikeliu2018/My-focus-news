@@ -151,7 +151,7 @@
   });
 
   const fetchData = (queryParams) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news-focus`;
+    const API_BASE_URL = `/api/news-focus`;
     const defaultParams = {
       keyword: '',
     };

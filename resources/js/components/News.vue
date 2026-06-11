@@ -152,7 +152,7 @@
   });
 
   const fetchData = (queryParams) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/news`;
+    const API_BASE_URL = `/api/news`;
     const defaultParams = {
       keyword: '',
     };
@@ -206,7 +206,7 @@
     },
   });
 
-  const dataSource = computed(() => data.value?.data.data.map(item => {
+  const dataSource = computed(() => data.value?.data?.data?.map(item => {
     // for table do index
     item.key = item.id;
     item.gmdate = moment.utc(item.gmdate, 'YYYY-MM-DD hh:mm:ss').tz(timezone).format('YYYY-MM-DD HH:mm:ss');

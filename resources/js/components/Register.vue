@@ -97,7 +97,7 @@
   };
 
   const doRegister = (queryParams) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/user/register`;
+    const API_BASE_URL = `/api/user/register`;
     const defaultParams = {};
     console.log('queryParams', queryParams);
     const params = { ...defaultParams, ...queryParams };

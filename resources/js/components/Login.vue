@@ -86,7 +86,7 @@
   };  
 
   const doLogin = (queryParams) => {
-    const API_BASE_URL = `${import.meta.env.VITE_APP_URL}/api/user/login`;
+    const API_BASE_URL = `/api/user/login`;
     const defaultParams = {};
     console.log('queryParams', queryParams);
     const params = { ...defaultParams, ...queryParams };
