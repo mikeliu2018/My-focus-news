@@ -1,0 +1,9 @@
+tunnel: 699bfd0b-7d38-4c5c-b4a9-b877133c86a0
+credentials-file: /etc/cloudflared/699bfd0b-7d38-4c5c-b4a9-b877133c86a0.json
+
+ingress:
+  - hostname: mynews.micro-tech.tw
+    service: http://my-focus-news:80
+  - hostname: my-news.micro-tech.tw
+    service: http://my-focus-news:80
+  - service: http_status:404
